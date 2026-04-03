@@ -1,0 +1,18 @@
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# Docker
+.env
+
+# Backend (Kotlin/Gradle)
+backend/.gradle/
+backend/build/
+backend/out/
+
+# Frontend (Node/Next)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
