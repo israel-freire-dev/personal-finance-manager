@@ -3,7 +3,7 @@ WORKDIR /app
 
 # Instala o bash e dos2unix pois o Alpine usa ash por padrão 
 # e scripts criados no Windows podem ter problemas de final de linha (\r\n)
-RUN apk add --no-cache bash dos2unix
+RUN apk update && apk add --no-cache bash dos2unix
 
 # Copia apenas os arquivos de configuração do Gradle primeiro (otimiza cache de camadas)
 COPY gradlew .
