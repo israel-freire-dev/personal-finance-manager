@@ -7,6 +7,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
+import tech.freire.dev.personal_finance_manager.domain.exception.DomainException
+
 data class Transaction(
     val id: UUID,
     val userId: UUID,
@@ -19,4 +21,13 @@ data class Transaction(
     val type: TransactionType,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
-)
+) {
+    init {
+        if (amount <= BigDecimal.ZERO) {
+            throw DomainException("Transaction amount must be greater than zero")
+        }
+        if (description.isBlank()) {
+            throw DomainException("Transaction description cannot be blank")
+        }
+    }
+}

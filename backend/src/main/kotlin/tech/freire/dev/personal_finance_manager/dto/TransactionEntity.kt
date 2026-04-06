@@ -1,6 +1,7 @@
 package tech.freire.dev.personal_finance_manager.dto
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.Positive
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionStatus
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionType
 import java.math.BigDecimal
@@ -28,7 +29,8 @@ data class TransactionEntity(
 
     @Column(nullable = false)
     val description: String,
-
+    
+    @Positive
     @Column(nullable = false, precision = 19, scale = 4)
     val amount: BigDecimal,
 
