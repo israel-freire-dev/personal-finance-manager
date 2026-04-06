@@ -1,3 +1,13 @@
 spring:
   application:
     name: personal-finance-manager
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db-personal-finance-manager
+    username: personal_finance_manager_admin
+    password: personal_finance_manager_admin
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    url: jdbc:postgresql://localhost:5432/db-personal-finance-manager
+    user: personal_finance_manager_admin
+    password: personal_finance_manager_admin
+    locations: classpath:db/migration
