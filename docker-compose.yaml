@@ -1,0 +1,27 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: finance-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SPRING_DATASOURCE_URL=${SUPABASE_DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${SUPABASE_DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${SUPABASE_DB_PASS}
+      - SPRING_PROFILES_ACTIVE=local
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: finance-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      - backend

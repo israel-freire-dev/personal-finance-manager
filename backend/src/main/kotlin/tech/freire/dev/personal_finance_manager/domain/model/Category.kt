@@ -1,0 +1,25 @@
+package tech.freire.dev.personal_finance_manager.domain.model
+
+import tech.freire.dev.personal_finance_manager.domain.enums.TransactionType
+import java.time.LocalDateTime
+import java.util.UUID
+
+import tech.freire.dev.personal_finance_manager.domain.exception.DomainException
+
+data class Category(
+    val id: UUID,
+    val userId: UUID,
+    val parentId: UUID?,
+    val name: String,
+    val type: TransactionType,
+    val color: String?,
+    val icon: String?,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+) {
+    init {
+        if (name.isBlank()) {
+            throw DomainException("Category name cannot be blank")
+        }
+    }
+}
