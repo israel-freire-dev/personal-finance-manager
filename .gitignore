@@ -8,6 +8,7 @@
 
 # Backend (Kotlin/Gradle)
 backend/.gradle/
+backend/.kotlin/
 backend/build/
 backend/out/
 
