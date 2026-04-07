@@ -1,6 +1,7 @@
 package tech.freire.dev.personal_finance_manager.dto
 
 import jakarta.persistence.*
+import tech.freire.dev.personal_finance_manager.domain.model.User
 import java.util.UUID
 
 @Entity
@@ -18,4 +19,19 @@ data class UserEntity(
 
     @Column(name = "password_hash", nullable = false)
     val passwordHash: String
-) : BaseEntity()
+) : BaseEntity() {
+
+    /**
+     * Converte entidade JPA para entidade de domínio.
+     */
+    fun toDomain(): User {
+        return User(
+            id = id,
+            name = name,
+            email = email,
+            passwordHash = passwordHash,
+            createdAt = createdAt ?: java.time.LocalDateTime.now(),
+            updatedAt = updatedAt ?: java.time.LocalDateTime.now()
+        )
+    }
+}

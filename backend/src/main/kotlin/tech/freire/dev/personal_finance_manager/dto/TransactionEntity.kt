@@ -4,6 +4,7 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Positive
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionStatus
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionType
+import tech.freire.dev.personal_finance_manager.domain.model.Transaction
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
@@ -44,4 +45,49 @@ data class TransactionEntity(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val type: TransactionType
-) : BaseEntity()
+) : BaseEntity() {
+
+    /**
+     * Converte entidade JPA para entidade de domínio.
+     */
+    fun toDomain(): Transaction {
+        return Transaction(
+            id = id,
+            userId = user.id,
+            categoryId = category.id,
+            recurringTemplateId = recurringTemplate?.id,
+            description = description,
+            amount = amount,
+            date = date,
+            status = status,
+            type = type,
+            createdAt = createdAt ?: java.time.LocalDateTime.now(),
+            updatedAt = updatedAt ?: java.time.LocalDateTime.now()
+        )
+    }
+
+    companion object {
+        /**
+         * Cria entidade JPA a partir da entidade de domínio.
+         * Requer as entidades JPA relacionadas pré-carregadas.
+         */
+        fun fromDomain(
+            transaction: Transaction,
+            user: UserEntity,
+            category: CategoryEntity,
+            recurringTemplate: RecurringTemplateEntity?
+        ): TransactionEntity {
+            return TransactionEntity(
+                id = transaction.id,
+                user = user,
+                category = category,
+                recurringTemplate = recurringTemplate,
+                description = transaction.description,
+                amount = transaction.amount,
+                date = transaction.date,
+                status = transaction.status,
+                type = transaction.type
+            )
+        }
+    }
+}

@@ -2,6 +2,7 @@ package tech.freire.dev.personal_finance_manager.dto
 
 import jakarta.persistence.*
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionType
+import tech.freire.dev.personal_finance_manager.domain.model.Category
 import java.util.UUID
 
 @Entity
@@ -30,4 +31,22 @@ data class CategoryEntity(
     val color: String?,
 
     val icon: String?
-) : BaseEntity()
+) : BaseEntity() {
+
+    /**
+     * Converte entidade JPA para entidade de domínio.
+     */
+    fun toDomain(): Category {
+        return Category(
+            id = id,
+            userId = user.id,
+            parentId = parent?.id,
+            name = name,
+            type = type,
+            color = color,
+            icon = icon,
+            createdAt = createdAt ?: java.time.LocalDateTime.now(),
+            updatedAt = updatedAt ?: java.time.LocalDateTime.now()
+        )
+    }
+}
