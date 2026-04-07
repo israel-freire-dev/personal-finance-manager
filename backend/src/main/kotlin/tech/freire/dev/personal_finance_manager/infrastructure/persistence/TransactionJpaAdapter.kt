@@ -56,4 +56,12 @@ class TransactionJpaAdapter(
     override fun delete(id: UUID) {
         jpaRepository.deleteById(id)
     }
+
+    override fun deleteByRecurringTemplateIdAndStatusAndDateAfter(
+        templateId: UUID,
+        status: tech.freire.dev.personal_finance_manager.domain.enums.TransactionStatus,
+        date: LocalDate
+    ): Int {
+        return jpaRepository.deleteByRecurringTemplateIdAndStatusAndDateAfter(templateId, status, date)
+    }
 }

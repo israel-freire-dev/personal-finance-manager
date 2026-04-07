@@ -26,7 +26,8 @@ import java.util.UUID
 @RequestMapping("/api/v1/transactions")
 @Tag(name = "Transações", description = "Operações de gerenciamento de transações financeiras")
 class TransactionController(
-    private val createTransactionUseCase: CreateTransactionInputPort
+    private val createTransactionUseCase: CreateTransactionInputPort,
+    private val deleteRecurringTemplateUseCase: tech.freire.dev.personal_finance_manager.application.usecase.DeleteRecurringTemplateUseCase
 ) {
 
     @PostMapping
@@ -66,6 +67,16 @@ class TransactionController(
             recurringTemplateId = request.recurringTemplateId
         )
         return createTransactionUseCase.execute(command)
+    }
+
+    @DeleteMapping("/recurring/{templateId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+        summary = "Deletar Template Recorrente",
+        description = "Deleta a assinatura/recorrência e remove todas as parcelas futuras que ainda estão PENDING."
+    )
+    fun deleteRecurringTemplate(@PathVariable templateId: UUID) {
+        deleteRecurringTemplateUseCase.execute(templateId)
     }
 }
 

@@ -10,4 +10,5 @@ interface TransactionRepository {
     fun findAllByUserId(userId: UUID): List<Transaction>
     fun findByUserIdAndDateRange(userId: UUID, from: LocalDate, to: LocalDate): List<Transaction>
     fun delete(id: UUID)
+    fun deleteByRecurringTemplateIdAndStatusAndDateAfter(templateId: UUID, status: tech.freire.dev.personal_finance_manager.domain.enums.TransactionStatus, date: LocalDate): Int
 }

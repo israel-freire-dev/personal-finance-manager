@@ -35,8 +35,29 @@ data class RecurringTemplateEntity(
     val startDate: LocalDate,
 
     @Column(name = "end_date")
-    val endDate: LocalDate?,
+    val endDate: LocalDate? = null,
 
     @Column(name = "total_installments")
-    val totalInstallments: Int?
-) : BaseEntity()
+    val totalInstallments: Int? = null,
+
+    @Column(name = "last_generated_date")
+    val lastGeneratedDate: LocalDate? = null
+) : BaseEntity() {
+
+    fun toDomain(): tech.freire.dev.personal_finance_manager.domain.model.RecurringTemplate {
+        return tech.freire.dev.personal_finance_manager.domain.model.RecurringTemplate(
+            id = id,
+            userId = user.id,
+            categoryId = category.id,
+            description = description,
+            amount = amount,
+            frequency = frequency,
+            startDate = startDate,
+            endDate = endDate,
+            totalInstallments = totalInstallments,
+            lastGeneratedDate = lastGeneratedDate,
+            createdAt = createdAt ?: java.time.LocalDateTime.now(),
+            updatedAt = updatedAt ?: java.time.LocalDateTime.now()
+        )
+    }
+}

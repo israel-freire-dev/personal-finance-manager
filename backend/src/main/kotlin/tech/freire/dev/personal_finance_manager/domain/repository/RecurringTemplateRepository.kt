@@ -9,5 +9,6 @@ interface RecurringTemplateRepository {
     fun findById(id: UUID): RecurringTemplate?
     fun findAllByUserId(userId: UUID): List<RecurringTemplate>
     fun findActiveByUserId(userId: UUID, referenceDate: LocalDate): List<RecurringTemplate>
+    fun findAllActiveTemplates(): List<RecurringTemplate>
     fun delete(id: UUID)
 }

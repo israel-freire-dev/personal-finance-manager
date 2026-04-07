@@ -18,6 +18,7 @@ data class RecurringTemplate(
     val startDate: LocalDate,
     val endDate: LocalDate?,
     val totalInstallments: Int?,
+    val lastGeneratedDate: LocalDate?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
