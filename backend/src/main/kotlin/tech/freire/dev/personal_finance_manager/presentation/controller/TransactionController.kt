@@ -1,11 +1,11 @@
-package tech.freire.dev.personal_finance_manager.adapter.inbound.web
+package tech.freire.dev.personal_finance_manager.presentation.controller
 
-import tech.freire.dev.personal_finance_manager.application.dto.CreateTransactionCommand
-import tech.freire.dev.personal_finance_manager.application.dto.TransactionResponse
-import tech.freire.dev.personal_finance_manager.application.port.input.CreateTransactionInputPort
+import tech.freire.dev.personal_finance_manager.application.request.CreateTransactionCommand
+import tech.freire.dev.personal_finance_manager.application.response.TransactionResponse
+import tech.freire.dev.personal_finance_manager.application.usecase.CreateTransactionInputPort
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionStatus
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionType
-import tech.freire.dev.personal_finance_manager.infrastructure.config.ErrorResponse
+import tech.freire.dev.personal_finance_manager.infrastructure.configuration.ErrorResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema

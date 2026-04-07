@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.*
-import tech.freire.dev.personal_finance_manager.application.dto.CreateTransactionCommand
+import tech.freire.dev.personal_finance_manager.application.request.CreateTransactionCommand
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionStatus
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionType
-import tech.freire.dev.personal_finance_manager.domain.exception.DomainException
+import tech.freire.dev.personal_finance_manager.domain.model.DomainException
 import tech.freire.dev.personal_finance_manager.domain.model.Category
 import tech.freire.dev.personal_finance_manager.domain.model.Transaction
 import tech.freire.dev.personal_finance_manager.domain.repository.CategoryRepository

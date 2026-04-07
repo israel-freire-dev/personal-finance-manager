@@ -1,4 +1,4 @@
-package tech.freire.dev.personal_finance_manager.dto
+package tech.freire.dev.personal_finance_manager.infrastructure.persistence
 
 import jakarta.persistence.*
 import jakarta.validation.constraints.Positive

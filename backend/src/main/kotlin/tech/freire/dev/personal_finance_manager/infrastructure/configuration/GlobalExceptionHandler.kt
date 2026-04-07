@@ -1,6 +1,6 @@
-package tech.freire.dev.personal_finance_manager.infrastructure.config
+package tech.freire.dev.personal_finance_manager.infrastructure.configuration
 
-import tech.freire.dev.personal_finance_manager.domain.exception.DomainException
+import tech.freire.dev.personal_finance_manager.domain.model.DomainException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler

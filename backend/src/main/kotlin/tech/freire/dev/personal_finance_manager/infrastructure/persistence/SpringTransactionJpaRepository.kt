@@ -1,6 +1,6 @@
-package tech.freire.dev.personal_finance_manager.adapter.outbound.persistence
+package tech.freire.dev.personal_finance_manager.infrastructure.persistence
 
-import tech.freire.dev.personal_finance_manager.dto.TransactionEntity
+import tech.freire.dev.personal_finance_manager.infrastructure.persistence.TransactionEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 

@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
 
-import tech.freire.dev.personal_finance_manager.domain.exception.DomainException
+import tech.freire.dev.personal_finance_manager.domain.model.DomainException
 
 data class MonthlySummary(
     val id: UUID,

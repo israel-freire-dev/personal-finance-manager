@@ -1,9 +1,9 @@
 package tech.freire.dev.personal_finance_manager.application.usecase
 
-import tech.freire.dev.personal_finance_manager.application.dto.CreateTransactionCommand
-import tech.freire.dev.personal_finance_manager.application.dto.TransactionResponse
-import tech.freire.dev.personal_finance_manager.application.port.input.CreateTransactionInputPort
-import tech.freire.dev.personal_finance_manager.domain.exception.DomainException
+import tech.freire.dev.personal_finance_manager.application.request.CreateTransactionCommand
+import tech.freire.dev.personal_finance_manager.application.response.TransactionResponse
+import tech.freire.dev.personal_finance_manager.application.usecase.CreateTransactionInputPort
+import tech.freire.dev.personal_finance_manager.domain.model.DomainException
 import tech.freire.dev.personal_finance_manager.domain.model.Transaction
 import tech.freire.dev.personal_finance_manager.domain.repository.CategoryRepository
 import tech.freire.dev.personal_finance_manager.domain.repository.TransactionRepository

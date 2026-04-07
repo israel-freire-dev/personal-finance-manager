@@ -1,4 +1,4 @@
-package tech.freire.dev.personal_finance_manager.adapter.outbound.persistence
+package tech.freire.dev.personal_finance_manager.infrastructure.persistence
 
 import tech.freire.dev.personal_finance_manager.domain.model.Category
 import tech.freire.dev.personal_finance_manager.domain.repository.CategoryRepository

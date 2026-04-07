@@ -1,4 +1,4 @@
-package tech.freire.dev.personal_finance_manager.infrastructure.config
+package tech.freire.dev.personal_finance_manager.infrastructure.configuration
 
 import tech.freire.dev.personal_finance_manager.application.usecase.CreateTransactionUseCase
 import tech.freire.dev.personal_finance_manager.domain.repository.CategoryRepository
