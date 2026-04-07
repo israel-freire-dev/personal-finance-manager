@@ -6,7 +6,6 @@ import tech.freire.dev.personal_finance_manager.application.response.UserRespons
 import java.util.UUID
 
 interface UserCrudInputPort {
-    fun create(command: CreateUserCommand): UserResponse
     fun findById(id: UUID): UserResponse?
     fun findByEmail(email: String): UserResponse?
     fun update(id: UUID, command: UpdateUserCommand): UserResponse

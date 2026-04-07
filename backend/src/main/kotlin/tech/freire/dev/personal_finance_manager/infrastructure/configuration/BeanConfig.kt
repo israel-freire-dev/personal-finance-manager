@@ -18,6 +18,20 @@ class BeanConfig {
     ): UserCrudInputPort = UserCrudUseCase(userRepository)
 
     @Bean
+    fun registerUserUseCase(
+        userRepository: UserRepository,
+        passwordHasher: tech.freire.dev.personal_finance_manager.domain.port.PasswordHasher,
+        jwtProvider: tech.freire.dev.personal_finance_manager.domain.port.JwtProvider
+    ): RegisterUserInputPort = RegisterUserUseCase(userRepository, passwordHasher, jwtProvider)
+
+    @Bean
+    fun loginUserUseCase(
+        userRepository: UserRepository,
+        passwordHasher: tech.freire.dev.personal_finance_manager.domain.port.PasswordHasher,
+        jwtProvider: tech.freire.dev.personal_finance_manager.domain.port.JwtProvider
+    ): LoginUserInputPort = LoginUserUseCase(userRepository, passwordHasher, jwtProvider)
+
+    @Bean
     fun categoryCrudUseCase(
         categoryRepository: CategoryRepository,
         userRepository: UserRepository

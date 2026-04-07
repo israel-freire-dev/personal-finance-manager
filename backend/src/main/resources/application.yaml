@@ -11,3 +11,7 @@ spring:
     user: personal_finance_manager_admin
     password: personal_finance_manager_admin
     locations: classpath:db/migration
+
+jwt:
+  secret: a2V5LXZlcnktc2VjcmV0LWFuZC1sb25nLWVub3VnaC1mb3ItMjU2LWJpdHMtc2lnbmF0dXJl
+  expiration: 86400000 # 24 horas em milissegundos

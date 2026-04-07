@@ -23,25 +23,6 @@ class UserController(
     private val userCrudUseCase: UserCrudInputPort
 ) {
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Criar usuário", description = "Cria um novo usuário na base.")
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "201", description = "Criado com sucesso",
-                content = [Content(schema = Schema(implementation = UserResponse::class))]
-            ),
-            ApiResponse(
-                responseCode = "400", description = "Erro de validação ou email duplicado",
-                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
-            )
-        ]
-    )
-    fun create(@RequestBody command: CreateUserCommand): UserResponse {
-        return userCrudUseCase.create(command)
-    }
-
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Buscar usuário por ID")

@@ -13,26 +13,6 @@ class UserCrudUseCase(
     private val userRepository: UserRepository
 ) : UserCrudInputPort {
 
-    override fun create(command: CreateUserCommand): UserResponse {
-        // Validate if email already exists
-        if (userRepository.findByEmail(command.email) != null) {
-            throw DomainException("Email already in use")
-        }
-
-        val now = LocalDateTime.now()
-        val user = User(
-            id = UUID.randomUUID(),
-            name = command.name,
-            email = command.email,
-            passwordHash = command.passwordHash,
-            createdAt = now,
-            updatedAt = now
-        )
-
-        val saved = userRepository.save(user)
-        return UserResponse.fromDomain(saved)
-    }
-
     override fun findById(id: UUID): UserResponse? {
         val user = userRepository.findById(id) ?: return null
         return UserResponse.fromDomain(user)

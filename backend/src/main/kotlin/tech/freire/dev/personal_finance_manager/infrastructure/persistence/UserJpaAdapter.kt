@@ -12,7 +12,7 @@ class UserJpaAdapter(
 
     override fun save(user: User): User {
         val entity = UserEntity(
-            id = user.id,
+            _id = user.id,
             name = user.name,
             email = user.email,
             passwordHash = user.passwordHash
