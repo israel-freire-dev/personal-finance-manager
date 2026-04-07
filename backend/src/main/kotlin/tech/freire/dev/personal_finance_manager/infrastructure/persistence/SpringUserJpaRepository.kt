@@ -8,4 +8,6 @@ import java.util.UUID
  * Spring Data JPA repository para UserEntity.
  * Camada de framework — apenas delega queries ao Spring Data.
  */
-interface SpringUserJpaRepository : JpaRepository<UserEntity, UUID>
+interface SpringUserJpaRepository : JpaRepository<UserEntity, UUID> {
+    fun findByEmail(email: String): UserEntity?
+}

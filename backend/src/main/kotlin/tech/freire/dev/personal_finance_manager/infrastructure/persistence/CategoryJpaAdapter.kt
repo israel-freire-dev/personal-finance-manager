@@ -11,12 +11,31 @@ import java.util.UUID
  */
 @Component
 class CategoryJpaAdapter(
-    private val jpaRepository: SpringCategoryJpaRepository
+    private val jpaRepository: SpringCategoryJpaRepository,
+    private val userJpaRepository: SpringUserJpaRepository
 ) : CategoryRepository {
 
     override fun save(category: Category): Category {
-        // Implementação completa será adicionada no use case de Category
-        throw UnsupportedOperationException("Save category not yet implemented in this adapter")
+        val userEntity = userJpaRepository.findById(category.userId)
+            .orElseThrow { IllegalStateException("User not found in database: ${category.userId}") }
+            
+        val parentEntity = category.parentId?.let {
+            jpaRepository.findById(it).orElseThrow { 
+                IllegalStateException("Parent category not found: it") 
+            }
+        }
+
+        val entity = CategoryEntity(
+            id = category.id,
+            user = userEntity,
+            parent = parentEntity,
+            name = category.name,
+            type = category.type,
+            color = category.color,
+            icon = category.icon
+        )
+        
+        return jpaRepository.save(entity).toDomain()
     }
 
     override fun findById(id: UUID): Category? {
@@ -26,9 +45,7 @@ class CategoryJpaAdapter(
     }
 
     override fun findAllByUserId(userId: UUID): List<Category> {
-        return jpaRepository.findAll()
-            .filter { it.user.id == userId }
-            .map { it.toDomain() }
+        return jpaRepository.findAllByUserId(userId).map { it.toDomain() }
     }
 
     override fun delete(id: UUID) {

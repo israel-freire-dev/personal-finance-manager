@@ -8,4 +8,6 @@ import java.util.UUID
  * Spring Data JPA repository para CategoryEntity.
  * Camada de framework — apenas delega queries ao Spring Data.
  */
-interface SpringCategoryJpaRepository : JpaRepository<CategoryEntity, UUID>
+interface SpringCategoryJpaRepository : JpaRepository<CategoryEntity, UUID> {
+    fun findAllByUserId(userId: UUID): List<CategoryEntity>
+}

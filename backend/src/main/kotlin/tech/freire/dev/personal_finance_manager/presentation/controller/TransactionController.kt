@@ -1,8 +1,11 @@
 package tech.freire.dev.personal_finance_manager.presentation.controller
 
 import tech.freire.dev.personal_finance_manager.application.request.CreateTransactionCommand
+import tech.freire.dev.personal_finance_manager.application.request.UpdateTransactionCommand
 import tech.freire.dev.personal_finance_manager.application.response.TransactionResponse
 import tech.freire.dev.personal_finance_manager.application.usecase.CreateTransactionInputPort
+import tech.freire.dev.personal_finance_manager.application.usecase.DeleteRecurringTemplateUseCase
+import tech.freire.dev.personal_finance_manager.application.usecase.TransactionCrudInputPort
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionStatus
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionType
 import tech.freire.dev.personal_finance_manager.infrastructure.configuration.ErrorResponse
@@ -13,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -27,7 +31,8 @@ import java.util.UUID
 @Tag(name = "Transações", description = "Operações de gerenciamento de transações financeiras")
 class TransactionController(
     private val createTransactionUseCase: CreateTransactionInputPort,
-    private val deleteRecurringTemplateUseCase: tech.freire.dev.personal_finance_manager.application.usecase.DeleteRecurringTemplateUseCase
+    private val transactionCrudUseCase: TransactionCrudInputPort,
+    private val deleteRecurringTemplateUseCase: DeleteRecurringTemplateUseCase
 ) {
 
     @PostMapping
@@ -55,29 +60,39 @@ class TransactionController(
             )
         ]
     )
-    fun create(@RequestBody request: CreateTransactionRequest): TransactionResponse {
-        val command = CreateTransactionCommand(
-            userId = request.userId,
-            categoryId = request.categoryId,
-            description = request.description,
-            amount = request.amount,
-            date = request.date,
-            status = request.status,
-            type = request.type,
-            recurringTemplateId = request.recurringTemplateId
-        )
+    fun create(@RequestBody command: CreateTransactionCommand): TransactionResponse {
         return createTransactionUseCase.execute(command)
     }
 
-    @DeleteMapping("/recurring/{templateId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(
-        summary = "Deletar Template Recorrente",
-        description = "Deleta a assinatura/recorrência e remove todas as parcelas futuras que ainda estão PENDING."
-    )
-    fun deleteRecurringTemplate(@PathVariable templateId: UUID) {
-        deleteRecurringTemplateUseCase.execute(templateId)
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Buscar transação por ID")
+    fun findById(@PathVariable id: UUID): ResponseEntity<TransactionResponse> {
+        val transaction = transactionCrudUseCase.findById(id) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(transaction)
     }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Listar transações por usuário")
+    fun findAllByUserId(@RequestParam userId: UUID): List<TransactionResponse> {
+        return transactionCrudUseCase.findAllByUserId(userId)
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Atualizar transação")
+    fun update(@PathVariable id: UUID, @RequestBody command: UpdateTransactionCommand): TransactionResponse {
+        return transactionCrudUseCase.update(id, command)
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Deletar transação")
+    fun delete(@PathVariable id: UUID) {
+        transactionCrudUseCase.delete(id)
+    }
+
 }
 
 /**

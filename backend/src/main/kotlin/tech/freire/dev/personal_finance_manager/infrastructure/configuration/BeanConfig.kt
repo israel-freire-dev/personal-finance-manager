@@ -1,19 +1,9 @@
 package tech.freire.dev.personal_finance_manager.infrastructure.configuration
 
-import tech.freire.dev.personal_finance_manager.application.usecase.CreateTransactionUseCase
-import tech.freire.dev.personal_finance_manager.application.usecase.CreateTransactionInputPort
-import tech.freire.dev.personal_finance_manager.application.usecase.ProcessRecurringTransactionsUseCase
-import tech.freire.dev.personal_finance_manager.application.usecase.ProcessRecurringTransactionsInputPort
-import tech.freire.dev.personal_finance_manager.application.usecase.DeleteRecurringTemplateUseCase
-import tech.freire.dev.personal_finance_manager.application.usecase.GetMonthlySummaryUseCase
-import tech.freire.dev.personal_finance_manager.application.usecase.GetMonthlySummaryInputPort
-import tech.freire.dev.personal_finance_manager.domain.repository.CategoryRepository
-import tech.freire.dev.personal_finance_manager.domain.repository.MonthlySummaryRepository
-import tech.freire.dev.personal_finance_manager.domain.repository.RecurringTemplateRepository
-import tech.freire.dev.personal_finance_manager.domain.repository.TransactionRepository
-import tech.freire.dev.personal_finance_manager.domain.repository.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import tech.freire.dev.personal_finance_manager.application.usecase.*
+import tech.freire.dev.personal_finance_manager.domain.repository.*
 
 /**
  * Configuração de injeção de dependência.
@@ -23,6 +13,17 @@ import org.springframework.context.annotation.Configuration
 class BeanConfig {
 
     @Bean
+    fun userCrudUseCase(
+        userRepository: UserRepository
+    ): UserCrudInputPort = UserCrudUseCase(userRepository)
+
+    @Bean
+    fun categoryCrudUseCase(
+        categoryRepository: CategoryRepository,
+        userRepository: UserRepository
+    ): CategoryCrudInputPort = CategoryCrudUseCase(categoryRepository, userRepository)
+
+    @Bean
     fun createTransactionUseCase(
         transactionRepository: TransactionRepository,
         categoryRepository: CategoryRepository,
@@ -30,6 +31,28 @@ class BeanConfig {
     ): CreateTransactionInputPort = CreateTransactionUseCase(
         transactionRepository, categoryRepository, monthlySummaryRepository
     )
+
+    @Bean
+    fun transactionCrudUseCase(
+        transactionRepository: TransactionRepository,
+        categoryRepository: CategoryRepository,
+        monthlySummaryRepository: MonthlySummaryRepository
+    ): TransactionCrudInputPort = TransactionCrudUseCase(
+        transactionRepository, categoryRepository, monthlySummaryRepository
+    )
+
+    @Bean
+    fun createRecurringTemplateUseCase(
+        recurringTemplateRepository: RecurringTemplateRepository,
+        categoryRepository: CategoryRepository
+    ): CreateRecurringTemplateInputPort = CreateRecurringTemplateUseCase(
+        recurringTemplateRepository, categoryRepository
+    )
+
+    @Bean
+    fun recurringTemplateCrudUseCase(
+        recurringTemplateRepository: RecurringTemplateRepository
+    ): RecurringTemplateCrudInputPort = RecurringTemplateCrudUseCase(recurringTemplateRepository)
 
     @Bean
     fun processRecurringTransactionsUseCase(
