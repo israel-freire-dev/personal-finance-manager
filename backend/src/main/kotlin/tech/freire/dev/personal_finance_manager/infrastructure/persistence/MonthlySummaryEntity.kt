@@ -30,9 +30,55 @@ data class MonthlySummaryEntity(
     @Column(name = "total_expenses", nullable = false, precision = 19, scale = 4)
     val totalExpenses: BigDecimal,
 
+    @Column(name = "total_income_pending", nullable = false, precision = 19, scale = 4)
+    val totalIncomePending: BigDecimal = BigDecimal.ZERO,
+
+    @Column(name = "total_expenses_pending", nullable = false, precision = 19, scale = 4)
+    val totalExpensesPending: BigDecimal = BigDecimal.ZERO,
+
     @Column(name = "closing_balance", nullable = false, precision = 19, scale = 4)
     val closingBalance: BigDecimal,
 
     @Column(name = "is_closed", nullable = false)
     val isClosed: Boolean
-) : BaseEntity()
+) : BaseEntity() {
+
+    fun toDomain(): tech.freire.dev.personal_finance_manager.domain.model.MonthlySummary {
+        return tech.freire.dev.personal_finance_manager.domain.model.MonthlySummary(
+            id = id,
+            userId = user.id,
+            month = month,
+            year = year,
+            openingBalance = openingBalance,
+            totalIncome = totalIncome,
+            totalExpenses = totalExpenses,
+            totalIncomePending = totalIncomePending,
+            totalExpensesPending = totalExpensesPending,
+            closingBalance = closingBalance,
+            isClosed = isClosed,
+            createdAt = createdAt ?: java.time.LocalDateTime.now(),
+            updatedAt = updatedAt ?: java.time.LocalDateTime.now()
+        )
+    }
+
+    companion object {
+        fun fromDomain(
+            summary: tech.freire.dev.personal_finance_manager.domain.model.MonthlySummary,
+            user: UserEntity
+        ): MonthlySummaryEntity {
+            return MonthlySummaryEntity(
+                id = summary.id,
+                user = user,
+                month = summary.month,
+                year = summary.year,
+                openingBalance = summary.openingBalance,
+                totalIncome = summary.totalIncome,
+                totalExpenses = summary.totalExpenses,
+                totalIncomePending = summary.totalIncomePending,
+                totalExpensesPending = summary.totalExpensesPending,
+                closingBalance = summary.closingBalance,
+                isClosed = summary.isClosed
+            )
+        }
+    }
+}

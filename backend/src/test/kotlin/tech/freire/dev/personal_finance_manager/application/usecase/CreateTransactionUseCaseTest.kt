@@ -10,10 +10,12 @@ import org.mockito.kotlin.*
 import tech.freire.dev.personal_finance_manager.application.request.CreateTransactionCommand
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionStatus
 import tech.freire.dev.personal_finance_manager.domain.enums.TransactionType
-import tech.freire.dev.personal_finance_manager.domain.model.DomainException
 import tech.freire.dev.personal_finance_manager.domain.model.Category
+import tech.freire.dev.personal_finance_manager.domain.model.DomainException
+import tech.freire.dev.personal_finance_manager.domain.model.MonthlySummary
 import tech.freire.dev.personal_finance_manager.domain.model.Transaction
 import tech.freire.dev.personal_finance_manager.domain.repository.CategoryRepository
+import tech.freire.dev.personal_finance_manager.domain.repository.MonthlySummaryRepository
 import tech.freire.dev.personal_finance_manager.domain.repository.TransactionRepository
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -25,6 +27,7 @@ class CreateTransactionUseCaseTest {
 
     private lateinit var transactionRepository: TransactionRepository
     private lateinit var categoryRepository: CategoryRepository
+    private lateinit var monthlySummaryRepository: MonthlySummaryRepository
     private lateinit var useCase: CreateTransactionUseCase
 
     private val userId = UUID.randomUUID()
@@ -47,7 +50,8 @@ class CreateTransactionUseCaseTest {
     fun setUp() {
         transactionRepository = mock()
         categoryRepository = mock()
-        useCase = CreateTransactionUseCase(transactionRepository, categoryRepository)
+        monthlySummaryRepository = mock()
+        useCase = CreateTransactionUseCase(transactionRepository, categoryRepository, monthlySummaryRepository)
     }
 
     private fun validCommand(
@@ -67,6 +71,12 @@ class CreateTransactionUseCaseTest {
         recurringTemplateId = recurringTemplateId
     )
 
+    /** Helper: stub para o MonthlySummaryRepository retornar/salvar um summary zerado. */
+    private fun stubSummaryRepository() {
+        whenever(monthlySummaryRepository.findByUserIdAndMonthYear(any(), any(), any())).thenReturn(null)
+        whenever(monthlySummaryRepository.save(any())).thenAnswer { it.getArgument<MonthlySummary>(0) }
+    }
+
     @Nested
     @DisplayName("Cenários de sucesso")
     inner class SuccessScenarios {
@@ -74,17 +84,13 @@ class CreateTransactionUseCaseTest {
         @Test
         @DisplayName("Deve criar transação com status PAID e retornar response correto")
         fun shouldCreateTransactionWithPaidStatus() {
-            // Arrange
             val command = validCommand(status = TransactionStatus.PAID)
             whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
-            whenever(transactionRepository.save(any())).thenAnswer { invocation ->
-                invocation.getArgument<Transaction>(0)
-            }
+            whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            stubSummaryRepository()
 
-            // Act
             val response = useCase.execute(command)
 
-            // Assert
             assertNotNull(response.id)
             assertEquals(userId.toString(), response.userId)
             assertEquals(categoryId.toString(), response.categoryId)
@@ -102,6 +108,7 @@ class CreateTransactionUseCaseTest {
             val command = validCommand(status = TransactionStatus.PENDING)
             whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
             whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            stubSummaryRepository()
 
             val response = useCase.execute(command)
 
@@ -114,6 +121,7 @@ class CreateTransactionUseCaseTest {
             val command = validCommand(status = TransactionStatus.INVESTED, type = TransactionType.EXPENSE)
             whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
             whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            stubSummaryRepository()
 
             val response = useCase.execute(command)
 
@@ -127,6 +135,7 @@ class CreateTransactionUseCaseTest {
             val command = validCommand(type = TransactionType.INCOME)
             whenever(categoryRepository.findById(categoryId)).thenReturn(incomeCategory)
             whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            stubSummaryRepository()
 
             val response = useCase.execute(command)
 
@@ -140,6 +149,7 @@ class CreateTransactionUseCaseTest {
             val command = validCommand(recurringTemplateId = templateId)
             whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
             whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            stubSummaryRepository()
 
             val response = useCase.execute(command)
 
@@ -152,6 +162,7 @@ class CreateTransactionUseCaseTest {
             val command = validCommand()
             whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
             whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            stubSummaryRepository()
 
             useCase.execute(command)
 
@@ -164,6 +175,7 @@ class CreateTransactionUseCaseTest {
             val command = validCommand()
             whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
             whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            stubSummaryRepository()
 
             useCase.execute(command)
 
@@ -176,6 +188,106 @@ class CreateTransactionUseCaseTest {
                 assertEquals(BigDecimal("150.50"), saved.amount)
                 assertEquals(TransactionStatus.PAID, saved.status)
                 assertEquals(TransactionType.EXPENSE, saved.type)
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Cenários de MonthlySummary")
+    inner class MonthlySummaryScenarios {
+
+        @Test
+        @DisplayName("Deve atualizar totalExpenses no summary ao criar transação PAID/EXPENSE")
+        fun shouldUpdateTotalExpensesWhenPaidExpense() {
+            val command = validCommand(status = TransactionStatus.PAID, type = TransactionType.EXPENSE)
+            whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
+            whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            whenever(monthlySummaryRepository.findByUserIdAndMonthYear(userId, 4, 2026)).thenReturn(null)
+            // Sem mês anterior
+            whenever(monthlySummaryRepository.findByUserIdAndMonthYear(userId, 3, 2026)).thenReturn(null)
+            whenever(monthlySummaryRepository.save(any())).thenAnswer { it.getArgument<MonthlySummary>(0) }
+
+            useCase.execute(command)
+
+            argumentCaptor<MonthlySummary>().apply {
+                verify(monthlySummaryRepository, times(1)).save(capture())
+                val saved = firstValue
+                assertEquals(BigDecimal("150.50"), saved.totalExpenses)
+                assertEquals(BigDecimal.ZERO, saved.totalIncome)
+                assertEquals(BigDecimal("-150.50"), saved.closingBalance)
+            }
+        }
+
+        @Test
+        @DisplayName("Deve atualizar totalExpensesPending no summary ao criar transação PENDING/EXPENSE")
+        fun shouldUpdateTotalExpensesPendingWhenPendingExpense() {
+            val command = validCommand(status = TransactionStatus.PENDING, type = TransactionType.EXPENSE)
+            whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
+            whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            whenever(monthlySummaryRepository.findByUserIdAndMonthYear(userId, 4, 2026)).thenReturn(null)
+            whenever(monthlySummaryRepository.findByUserIdAndMonthYear(userId, 3, 2026)).thenReturn(null)
+            whenever(monthlySummaryRepository.save(any())).thenAnswer { it.getArgument<MonthlySummary>(0) }
+
+            useCase.execute(command)
+
+            argumentCaptor<MonthlySummary>().apply {
+                verify(monthlySummaryRepository, times(1)).save(capture())
+                val saved = firstValue
+                assertEquals(BigDecimal("150.50"), saved.totalExpensesPending)
+                assertEquals(BigDecimal.ZERO, saved.totalExpenses)
+                assertEquals(BigDecimal.ZERO, saved.closingBalance) // Saldo real não muda
+            }
+        }
+
+        @Test
+        @DisplayName("Deve usar closingBalance do mês anterior como openingBalance (rollover)")
+        fun shouldRolloverFromPreviousMonth() {
+            val previousSummary = MonthlySummary.createEmpty(
+                userId = userId, month = 3, year = 2026,
+                openingBalance = BigDecimal("1000.00")
+            ).let {
+                // Simula mês anterior com totalIncome de R$500
+                it.applyTransaction(BigDecimal("500.00"), TransactionType.INCOME, TransactionStatus.PAID)
+            }
+            // previousSummary.closingBalance = 1000 + 500 - 0 = 1500
+
+            val command = validCommand(status = TransactionStatus.PAID, type = TransactionType.EXPENSE, amount = BigDecimal("200.00"))
+            whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
+            whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            whenever(monthlySummaryRepository.findByUserIdAndMonthYear(userId, 4, 2026)).thenReturn(null)
+            whenever(monthlySummaryRepository.findByUserIdAndMonthYear(userId, 3, 2026)).thenReturn(previousSummary)
+            whenever(monthlySummaryRepository.save(any())).thenAnswer { it.getArgument<MonthlySummary>(0) }
+
+            useCase.execute(command)
+
+            argumentCaptor<MonthlySummary>().apply {
+                verify(monthlySummaryRepository, times(1)).save(capture())
+                val saved = firstValue
+                assertEquals(BigDecimal("1500.00"), saved.openingBalance)
+                assertEquals(BigDecimal("200.00"), saved.totalExpenses)
+                // closingBalance = 1500 + 0 - 200 = 1300
+                assertEquals(BigDecimal("1300.00"), saved.closingBalance)
+            }
+        }
+
+        @Test
+        @DisplayName("Transação REFUNDED não deve impactar saldos")
+        fun shouldNotImpactWhenRefunded() {
+            val command = validCommand(status = TransactionStatus.REFUNDED, type = TransactionType.EXPENSE)
+            whenever(categoryRepository.findById(categoryId)).thenReturn(validCategory)
+            whenever(transactionRepository.save(any())).thenAnswer { it.getArgument<Transaction>(0) }
+            whenever(monthlySummaryRepository.findByUserIdAndMonthYear(userId, 4, 2026)).thenReturn(null)
+            whenever(monthlySummaryRepository.findByUserIdAndMonthYear(userId, 3, 2026)).thenReturn(null)
+            whenever(monthlySummaryRepository.save(any())).thenAnswer { it.getArgument<MonthlySummary>(0) }
+
+            useCase.execute(command)
+
+            argumentCaptor<MonthlySummary>().apply {
+                verify(monthlySummaryRepository, times(1)).save(capture())
+                val saved = firstValue
+                assertEquals(BigDecimal.ZERO, saved.totalExpenses)
+                assertEquals(BigDecimal.ZERO, saved.totalExpensesPending)
+                assertEquals(BigDecimal.ZERO, saved.closingBalance)
             }
         }
     }
