@@ -6,13 +6,15 @@ services:
     container_name: finance-backend
     ports:
       - "8080:8080"
-    env_file:
-      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      - SPRING_DATASOURCE_URL=${SUPABASE_DB_URL}
-      - SPRING_DATASOURCE_USERNAME=${SUPABASE_DB_USER}
-      - SPRING_DATASOURCE_PASSWORD=${SUPABASE_DB_PASS}
-      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/db-personal-finance-manager
+      - SPRING_DATASOURCE_USERNAME=personal_finance_manager_admin
+      - SPRING_DATASOURCE_PASSWORD=personal_finance_manager_admin
+      - SPRING_FLYWAY_URL=jdbc:postgresql://host.docker.internal:5432/db-personal-finance-manager
+      - SPRING_FLYWAY_USER=personal_finance_manager_admin
+      - SPRING_FLYWAY_PASSWORD=personal_finance_manager_admin
 
   frontend:
     build:
